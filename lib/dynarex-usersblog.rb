@@ -7,12 +7,14 @@ require 'fileutils'
 
 class DynarexUsersBlog
 
-  def initialize(user='')
+  def initialize(file_path='users/', user='')
 
-    unless user.empty? then
+    unless user.empty? then      
       @current_user = user
       
-      user_file_path = 'users/' + @current_user
+      file_path + '/' unless file_path[/\/$/] 
+      
+      user_file_path = file_path + @current_user
       FileUtils.mkdir_p user_file_path
 
       @user_blog = DynarexBlog.new user_file_path
