@@ -7,22 +7,24 @@ require 'fileutils'
 
 class DynarexUsersBlog
 
-  def initialize(file_path='users/', user='')
+  def initialize(file_path='.', user='')
 
-    unless user.empty? then      
-      @current_user = user
-      
-      file_path + '/' unless file_path[/\/$/] 
-      
-      user_file_path = file_path + @current_user
-      FileUtils.mkdir_p user_file_path
+    threads = []
+    threads << Thread.new{
+      unless user.empty? then      
+        @current_user = user      
+        @file_path = file_path      
+        user_file_path = "%s/users/%s" % [@file_path,  @current_user]
 
-      @user_blog = DynarexBlog.new user_file_path
-      @current_blog = @user_blog
-    end
+        FileUtils.mkdir_p user_file_path
+        @user_blog = DynarexBlog.new user_file_path
+        @current_blog = @user_blog
+      end
+    }
 
-    @master_blog = DynarexBlog.new
-
+    threads << Thread.new{@master_blog = DynarexBlog.new file_path}
+    threads.each{|thread| thread.join}
+    
     super()
   end
 
@@ -38,7 +40,7 @@ class DynarexUsersBlog
     @master_blog.delete id
   end
 
-  def page(n)
+  def page(n=1)
     @master_blog.page(n)
   end
 
@@ -47,7 +49,7 @@ class DynarexUsersBlog
   end
 
   def user(user_name)
-    user_file_path = 'users/' + user_name
+    user_file_path = "%s/users/%s" % [@file_path,  @current_user]
     DynarexBlog.new(user_file_path)
   end
   
