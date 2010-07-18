@@ -40,7 +40,7 @@ class DynarexUsersBlog
     @master_blog.delete id
   end
 
-  def page(n=1)
+  def page(n=0)
     @master_blog.page(n)
   end
 
@@ -53,5 +53,10 @@ class DynarexUsersBlog
     DynarexBlog.new(user_file_path)
   end
   
+  def length
+    @master_blog.length
+  end
+  
+  alias size length
 end
 
