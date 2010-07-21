@@ -53,10 +53,9 @@ class DynarexUsersBlog
     DynarexBlog.new(user_file_path)
   end
   
-  def length
-    @master_blog.length
+  def entry(id)
+    @master_blog.entry(id)
   end
   
-  alias size length
 end
 
