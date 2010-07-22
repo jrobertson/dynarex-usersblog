@@ -4,6 +4,7 @@
 
 require 'dynarex-blog'
 require 'fileutils'
+require 'hashcache'
 
 class DynarexUsersBlog
 
@@ -17,7 +18,8 @@ class DynarexUsersBlog
         user_file_path = "%s/users/%s" % [@file_path,  @current_user]
 
         FileUtils.mkdir_p user_file_path
-        @user_blog = DynarexBlog.new user_file_path
+        @hc_blog = HashCache.new
+        @user_blog = @hc_blog.read(user) { DynarexBlog.new user_file_path }
         @current_blog = @user_blog
       end
     }
@@ -50,7 +52,7 @@ class DynarexUsersBlog
 
   def user(user_name)
     user_file_path = "%s/users/%s" % [@file_path,  @current_user]
-    DynarexBlog.new(user_file_path)
+    @hc_blog.read(@current_user) { DynarexBlog.new user_file_path }
   end
   
   def entry(id)
