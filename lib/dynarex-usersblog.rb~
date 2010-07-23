@@ -59,9 +59,5 @@ class DynarexUsersBlog
     @master_blog.entry(id)
   end
   
-  def tags
-    @master_blog.tags
-  end
-  
 end
 
