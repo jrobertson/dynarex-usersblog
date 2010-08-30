@@ -19,8 +19,7 @@ class DynarexUsersBlog
 
         FileUtils.mkdir_p user_file_path
         @hc_blog = HashCache.new
-        @user_blog = @hc_blog.read(user) { DynarexBlog.new user_file_path }
-        @current_blog = @user_blog
+	switch_user user
       end
     }
 
@@ -50,9 +49,8 @@ class DynarexUsersBlog
     @master_blog.tag(tag_name)
   end
 
-  def user(user_name)
-    user_file_path = "%s/users/%s" % [@file_path,  @current_user]
-    @hc_blog.read(@current_user) { DynarexBlog.new user_file_path }
+  def user(username)
+    (@current_user == username ? @current_user : switch_user(username))
   end
   
   def entry(id)
@@ -61,6 +59,18 @@ class DynarexUsersBlog
   
   def tags
     @master_blog.tags
+  end
+  
+  def update_user(user, id=0, h={})
+    switch_user user unless @current_user == user
+    @user_blog.update(id, h)
+    @master_blog.update(id, h)
+  end
+  
+  def switch_user(user)
+    user_file_path = "%s/users/%s" % [@file_path,  user]
+    @user_blog = @hc_blog.read(user) { DynarexBlog.new user_file_path }
+    @current_blog = @user_blog
   end
   
 end
