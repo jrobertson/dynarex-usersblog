@@ -29,7 +29,8 @@ class DynarexUsersBlog
     super()
   end
 
-  def create_entry(blog_params={})
+  def create_entry(blog_params={}, user='')
+    switch_user user unless user.empty? or @current_user == user
     blog_params.merge!({user: @current_user})
     @user_blog.create_entry blog_params
     @master_blog.id = @user_blog.id.to_i - 1
