@@ -8,22 +8,26 @@ require 'hashcache'
 
 class DynarexUsersBlog
 
-  def initialize(file_path='.', user='')
+  def initialize(options={})
+
+    o = {file_path: '.', user: ''}.merge(options)
 
     threads = []
     threads << Thread.new{
-      unless user.empty? then      
-        @current_user = user      
-        @file_path = file_path      
+
+      unless o[:user].empty? then      
+
+        @current_user = o[:user]
+        @file_path = o[:file_path]
         user_file_path = "%s/users/%s" % [@file_path,  @current_user]
 
         FileUtils.mkdir_p user_file_path
         @hc_blog = HashCache.new
-	switch_user user
+	      switch_user o[:user]
       end
     }
 
-    threads << Thread.new{@master_blog = DynarexBlog.new file_path}
+    threads << Thread.new{@master_blog = DynarexBlog.new o[:file_path]}
     threads.each{|thread| thread.join}
     
     super()
@@ -69,10 +73,10 @@ class DynarexUsersBlog
   end
   
   def switch_user(user)
+
     user_file_path = "%s/users/%s" % [@file_path,  user]
     @user_blog = @hc_blog.read(user) { DynarexBlog.new user_file_path }
     @current_blog = @user_blog
   end
   
 end
-

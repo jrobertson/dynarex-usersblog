@@ -2,7 +2,8 @@
 
 # file: dynarex-usersblog.rb
 
-require 'dynarex-blog'
+#require 'dynarex-blog'
+require '/home/james/learning/ruby/dynarex-blog'
 require 'fileutils'
 require 'hashcache'
 
@@ -33,8 +34,8 @@ class DynarexUsersBlog
     super()
   end
 
-  def create_entry(blog_params={}, user='')
-    switch_user user unless user.empty? or @current_user == user
+  def create_entry(blog_params={}, user=nil)
+    switch_user user unless user.nil? or user.empty? or @current_user == user
     blog_params.merge!({user: @current_user})
     @user_blog.create_entry blog_params
     @master_blog.id = @user_blog.id.to_i - 1
@@ -56,6 +57,7 @@ class DynarexUsersBlog
 
   def user(username)
     (@current_user == username ? @current_user : switch_user(username))
+    self
   end
   
   def entry(id)
@@ -66,7 +68,7 @@ class DynarexUsersBlog
     @master_blog.tags
   end
   
-  def update_user(user, id=0, h={})
+  def update_entry(user, id=0, h={})
     switch_user user unless @current_user == user
     @user_blog.update(id, h)
     @master_blog.update(id, h)
